@@ -1,5 +1,6 @@
 from aiogram import Bot, Dispatcher, types
 from aiogram.enums import ParseMode
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters.command import Command, CommandStart
 from aiogram.types import Message
 from aiogram.utils.keyboard import InlineKeyboardBuilder
@@ -430,14 +431,26 @@ async def handle_response(message, response_data, full_response):
 async def send_response(message, text):
     # A negative message.chat.id is a group message
     if message.chat.id < 0 or message.chat.id == message.from_user.id:
-        await bot.send_message(chat_id=message.chat.id, text=text,parse_mode=ParseMode.MARKDOWN)
+        try:
+            await bot.send_message(chat_id=message.chat.id, text=text, parse_mode=ParseMode.MARKDOWN)
+        except TelegramBadRequest as e:
+            logging.warning(f"Markdown parse error, retrying as plain text: {e}")
+            await bot.send_message(chat_id=message.chat.id, text=text)
     else:
-        await bot.edit_message_text(
-            chat_id=message.chat.id,
-            message_id=message.message_id,
-            text=text,
-            parse_mode=ParseMode.MARKDOWN,
-        )
+        try:
+            await bot.edit_message_text(
+                chat_id=message.chat.id,
+                message_id=message.message_id,
+                text=text,
+                parse_mode=ParseMode.MARKDOWN,
+            )
+        except TelegramBadRequest as e:
+            logging.warning(f"Markdown parse error, retrying as plain text: {e}")
+            await bot.edit_message_text(
+                chat_id=message.chat.id,
+                message_id=message.message_id,
+                text=text,
+            )
 
 async def ollama_request(message: types.Message, prompt: str = None):
     try:
@@ -490,12 +503,20 @@ async def ollama_request(message: types.Message, prompt: str = None):
                     break
 
     except Exception as e:
-        print(f"-----\n[OllamaAPI-ERR] CAUGHT FAULT!\n{traceback.format_exc()}\n-----")
-        await bot.send_message(
-            chat_id=message.chat.id,
-            text=f"Something went wrong: {str(e)}",
-            parse_mode=ParseMode.HTML,
-        )
+        tb = traceback.format_exc()
+        logging.error(f"-----\n[OllamaAPI-ERR] CAUGHT FAULT!\n{tb}\n-----")
+        if message.from_user.id in admin_ids:
+            await bot.send_message(
+                chat_id=message.chat.id,
+                text=f"Something went wrong: {str(e)}\n\nDetails:\n<pre>{tb}</pre>",
+                parse_mode=ParseMode.HTML,
+            )
+        else:
+            await bot.send_message(
+                chat_id=message.chat.id,
+                text=f"Something went wrong: {str(e)}",
+                parse_mode=ParseMode.HTML,
+            )
 
 async def main():
     init_db()
