@@ -116,19 +116,9 @@ The official image is available at dockerhub: [ruecat/ollama-telegram](https://h
 
 ## Installation (Unraid)
 
-Unraid users need to build the image locally before adding it via the Unraid web UI.
+The pre-built image is published to the GitHub Container Registry (GHCR) and can be pulled directly — no local build required.
 
-### 1. Build the image on your Unraid server
-
-Open a terminal (e.g. via the Unraid web UI → **Terminal**) and run:
-
-```bash
-git clone https://github.com/julesdg6/ollama-telegram.git
-cd ollama-telegram
-docker build -t ollama-telegram .
-```
-
-### 2. Add the container via the Unraid template
+### 1. Add the container via the Unraid template
 
 A ready-made Unraid template is included in this repo at [`unraid/ollama-telegram.xml`](unraid/ollama-telegram.xml).
 
@@ -142,14 +132,14 @@ Then in the Unraid web UI go to **Docker** → **Add Container** and select **ol
 
 | Field | Value |
 |---|---|
-| **Repository** | `ollama-telegram:latest` |
+| **Repository** | `ghcr.io/julesdg6/ollama-telegram:latest` |
 | **Network** | `bridge` |
 | **TOKEN** | Your Telegram bot token |
 | **ADMIN_IDS** | Your Telegram user ID(s) |
 | **USER_IDS** | Allowed user ID(s) |
 | **OLLAMA_BASE_URL** | See networking note below |
 
-### 3. Networking
+### 2. Networking
 
 How you set `OLLAMA_BASE_URL` depends on how Ollama is running:
 
