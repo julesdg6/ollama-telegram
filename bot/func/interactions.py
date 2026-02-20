@@ -8,12 +8,15 @@ from aiogram import types
 from aiohttp import ClientTimeout
 from asyncio import Lock
 from functools import wraps
+from urllib.parse import urlparse
 from dotenv import load_dotenv
 load_dotenv()
 token = os.getenv("TOKEN")
 allowed_ids = list(map(int, os.getenv("USER_IDS", "").split(",")))
 admin_ids = list(map(int, os.getenv("ADMIN_IDS", "").split(",")))
 ollama_base_url = os.getenv("OLLAMA_BASE_URL")
+if ollama_base_url and "://" in ollama_base_url:
+    ollama_base_url = urlparse(ollama_base_url).hostname
 ollama_port = os.getenv("OLLAMA_PORT", "11434")
 log_level_str = os.getenv("LOG_LEVEL", "INFO")
 allow_all_users_in_groups = bool(int(os.getenv("ALLOW_ALL_USERS_IN_GROUPS", "0")))
