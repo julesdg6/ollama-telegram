@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>ollama-telegram</Name>
+  <Repository>ollama-telegram:latest</Repository>
+  <Registry></Registry>
+  <Network>bridge</Network>
+  <Shell>sh</Shell>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/julesdg6/ollama-telegram</Support>
+  <Project>https://github.com/julesdg6/ollama-telegram</Project>
+  <Overview>Telegram bot that lets you chat with your local LLM via Ollama.</Overview>
+  <Category>Tools:</Category>
+  <Icon>https://raw.githubusercontent.com/julesdg6/ollama-telegram/main/res/github/ollama-telegram-readme.png</Icon>
+  <Config Name="Telegram Bot Token" Target="TOKEN" Default="" Mode="" Description="Your Telegram bot token from @BotFather." Type="Variable" Display="always" Required="true" Mask="true"></Config>
+  <Config Name="Admin IDs" Target="ADMIN_IDS" Default="" Mode="" Description="Comma-separated Telegram user IDs with admin access (can change model and control the bot). Example: 1234567890,0987654321" Type="Variable" Display="always" Required="true" Mask="false"></Config>
+  <Config Name="User IDs" Target="USER_IDS" Default="" Mode="" Description="Comma-separated Telegram user IDs allowed to chat with the bot. Example: 1234567890,0987654321" Type="Variable" Display="always" Required="true" Mask="false"></Config>
+  <Config Name="Initial Model" Target="INITMODEL" Default="llama2" Mode="" Description="Default Ollama model to use on startup. Example: mistral:latest" Type="Variable" Display="always" Required="false" Mask="false">llama2</Config>
+  <Config Name="Ollama Base URL" Target="OLLAMA_BASE_URL" Default="http://ollama" Mode="" Description="Base URL of your Ollama instance (no trailing slash). Use http://ollama if Ollama runs in Docker on the same network, or http://&lt;unraid-ip&gt; if Ollama uses host networking." Type="Variable" Display="always" Required="false" Mask="false">http://ollama</Config>
+  <Config Name="Ollama Port" Target="OLLAMA_PORT" Default="11434" Mode="" Description="Port your Ollama instance listens on." Type="Variable" Display="always" Required="false" Mask="false">11434</Config>
+  <Config Name="Timezone" Target="TZ" Default="UTC" Mode="" Description="Timezone for the container. Example: America/New_York" Type="Variable" Display="always" Required="false" Mask="false">UTC</Config>
+  <Config Name="Allow All Users in Groups" Target="ALLOW_ALL_USERS_IN_GROUPS" Default="0" Mode="" Description="Set to 1 to allow all members of a group chat to use the bot without being listed in USER_IDS." Type="Variable" Display="advanced" Required="false" Mask="false">0</Config>
+  <Config Name="Response Timeout" Target="TIMEOUT" Default="3000" Mode="" Description="Timeout in seconds for generating responses." Type="Variable" Display="advanced" Required="false" Mask="false">3000</Config>
+  <Config Name="Log Level" Target="LOG_LEVEL" Default="INFO" Mode="" Description="Python logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)." Type="Variable" Display="advanced" Required="false" Mask="false">INFO</Config>
+</Container>
