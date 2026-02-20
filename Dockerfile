@@ -1,5 +1,10 @@
 FROM python:3.12-alpine
 
+LABEL \
+  org.opencontainers.image.title="ollama-telegram" \
+  org.opencontainers.image.description="Telegram bot that lets you chat with your local LLM via Ollama" \
+  org.opencontainers.image.source="https://github.com/julesdg6/ollama-telegram"
+
 ARG APPHOMEDIR=code
 ARG USERNAME=user
 ARG USER_UID=1001
