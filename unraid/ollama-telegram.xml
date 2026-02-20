@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <Container version="2">
   <Name>ollama-telegram</Name>
-  <Repository>ollama-telegram:latest</Repository>
-  <Registry></Registry>
+  <Repository>ghcr.io/julesdg6/ollama-telegram:latest</Repository>
+  <Registry>https://ghcr.io</Registry>
   <Network>bridge</Network>
   <Shell>sh</Shell>
   <Privileged>false</Privileged>
