@@ -334,17 +334,22 @@ async def handle_message(message: types.Message):
 async def is_mentioned_in_group_or_supergroup(message: types.Message):
     if message.chat.type not in ["group", "supergroup"]:
         return False
-    
-    is_mentioned = (
-        (message.text and message.text.startswith(mention)) or
-        (message.caption and message.caption.startswith(mention))
-    )
-    
+
+    is_mentioned = False
+    entities = (message.entities or []) + (message.caption_entities or [])
+    for entity in entities:
+        if entity.type == "mention":
+            text = message.text or message.caption or ""
+            mentioned_username = text[entity.offset:entity.offset + entity.length]
+            if mentioned_username.lower() == mention.lower():
+                is_mentioned = True
+                break
+
     is_reply_to_bot = (
-        message.reply_to_message and 
+        message.reply_to_message and
         message.reply_to_message.from_user.id == bot.id
     )
-    
+
     return is_mentioned or is_reply_to_bot
 
 async def collect_message_thread(message: types.Message, thread=None):
@@ -522,6 +527,12 @@ async def main():
     init_db()
     allowed_ids = load_allowed_ids_from_db()
     print(f"allowed_ids: {allowed_ids}")
+    if group_ids:
+        logging.info(f"Bot is allowed to respond in group IDs: {group_ids}")
+    elif allow_all_users_in_groups:
+        logging.info("Bot is allowed to respond in ALL groups (ALLOW_ALL_USERS_IN_GROUPS=1)")
+    else:
+        logging.info("No GROUP_IDS configured and ALLOW_ALL_USERS_IN_GROUPS=0. Bot will NOT respond in groups.")
     await bot.set_my_commands(commands)
     await dp.start_polling(bot, skip_update=True)
 

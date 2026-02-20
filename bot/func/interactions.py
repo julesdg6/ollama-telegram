@@ -189,7 +189,9 @@ def perms_allowed(func):
             if message:
                 if message and message.chat.type in ["supergroup", "group"]:
                     if allow_all_users_in_groups or message.chat.id in group_ids:
+                        logging.info(f"Allowing message from user {user_id} in group {message.chat.id} ({message.chat.title})")
                         return await func(message)
+                    logging.info(f"Denying message from user {user_id} in group {message.chat.id} ({message.chat.title}): group not in GROUP_IDS {group_ids}")
                     return
                 await message.answer("Access Denied")
             elif query:
