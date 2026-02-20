@@ -12,8 +12,9 @@ from urllib.parse import urlparse
 from dotenv import load_dotenv
 load_dotenv()
 token = os.getenv("TOKEN")
-allowed_ids = list(map(int, os.getenv("USER_IDS", "").split(",")))
-admin_ids = list(map(int, os.getenv("ADMIN_IDS", "").split(",")))
+allowed_ids = list(map(int, filter(None, os.getenv("USER_IDS", "").split(","))))
+admin_ids = list(map(int, filter(None, os.getenv("ADMIN_IDS", "").split(","))))
+group_ids = list(map(int, filter(None, os.getenv("GROUP_IDS", "").split(","))))
 ollama_base_url = os.getenv("OLLAMA_BASE_URL")
 if ollama_base_url and "://" in ollama_base_url:
     ollama_base_url = urlparse(ollama_base_url).hostname
@@ -187,7 +188,7 @@ def perms_allowed(func):
         else:
             if message:
                 if message and message.chat.type in ["supergroup", "group"]:
-                    if allow_all_users_in_groups:
+                    if allow_all_users_in_groups or message.chat.id in group_ids:
                         return await func(message)
                     return
                 await message.answer("Access Denied")
