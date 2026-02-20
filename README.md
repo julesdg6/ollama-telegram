@@ -174,6 +174,59 @@ How you set `OLLAMA_BASE_URL` depends on how Ollama is running:
 
 
 
+## Usage
+
+### Private Chats
+
+1. Start the bot with `/start`.
+2. If you are not yet registered, press the **📝 Register** button in the welcome message to add yourself to the allowed-users list.
+3. Your Telegram user ID must appear in `USER_IDS` **or** `ADMIN_IDS` (or you must have already registered via the button). Once authorised, simply send any text or image message and the bot will reply.
+4. Use `/reset` at any time to clear the current conversation history and start fresh.
+
+### Group Chats
+
+Add the bot to a group, then interact with it in one of two ways:
+
+| Method | How |
+|---|---|
+| **Mention** | Start your message with `@<botusername>` |
+| **Reply** | Reply directly to any of the bot's previous messages |
+
+> **Note:** By default only users listed in `USER_IDS` or `ADMIN_IDS` can trigger the bot in a group. Set `ALLOW_ALL_USERS_IN_GROUPS=1` in `.env` to let **all** group members use the bot without adding each one to `USER_IDS`.
+
+### Bot Commands
+
+| Command | Available to | Description |
+|---|---|---|
+| `/start` | Everyone | Show the welcome message with quick-action buttons |
+| `/reset` | Allowed users | Clear the current conversation history |
+| `/history` | Allowed users | Display the current conversation history |
+| `/pullmodel <name>` | Admins | Download a model from Ollama (e.g. `/pullmodel mistral:latest`) |
+| `/addglobalprompt <text>` | Admins | Add a system prompt shared with all users |
+| `/addprivateprompt <text>` | Admins | Add a system prompt visible only to you |
+
+### Admin Guide
+
+Users whose Telegram ID appears in `ADMIN_IDS` have extra capabilities on top of regular chat:
+
+**Settings menu** (tap ⚙️ Settings from `/start`):
+
+| Button | Action |
+|---|---|
+| 🔄 Switch LLM | Choose which locally available Ollama model the bot uses |
+| 🗑️ Delete LLM | Remove a model from your Ollama instance |
+| 📋 Select System Prompt | Pick a previously saved system prompt to apply to new conversations |
+| 🗑️ Delete System Prompt | Remove a saved system prompt |
+| 📋 List Users and remove User | View all registered users and remove any of them |
+
+**ℹ️ About** (tap ℹ️ About from `/start`):
+
+Shows the currently active model and the default model set in `.env`.
+
+**Finding your Telegram user ID:**
+
+The easiest way is to message [@userinfobot](https://t.me/userinfobot) on Telegram — it replies with your numeric user ID. Add that number to `ADMIN_IDS` or `USER_IDS` in your `.env` file.
+
 ## Credits
 + [Ollama](https://github.com/jmorganca/ollama)
 
