@@ -415,12 +415,13 @@ async def add_prompt_to_active_chats(message, prompt, image_base64, modelname, s
             "stream": True,
         }
 
-async def handle_response(message, response_data, full_response):
+async def handle_response(message, response_data, full_response, active_modelname=None):
     full_response_stripped = full_response.strip()
     if full_response_stripped == "":
         return
     if response_data.get("done"):
-        text = f"{full_response_stripped}\n\n⚙️ {modelname}\nGenerated in {response_data.get('total_duration') / 1e9:.2f}s."
+        display_model = active_modelname if active_modelname else modelname
+        text = f"{full_response_stripped}\n\n⚙️ {display_model}\nGenerated in {response_data.get('total_duration') / 1e9:.2f}s."
         await send_response(message, text)
         async with ACTIVE_CHATS_LOCK:
             if ACTIVE_CHATS.get(message.from_user.id) is not None:
@@ -467,6 +468,19 @@ async def ollama_request(message: types.Message, prompt: str = None):
         if prompt is None:
             prompt = message.text or message.caption
 
+        # Use the vision model when an image is present and the model is available
+        active_modelname = modelname
+        if image_base64:
+            available_vision = await get_available_vision_model()
+            if available_vision:
+                active_modelname = available_vision
+                logging.info(f"Using vision model: {active_modelname} for image processing")
+            else:
+                logging.warning(
+                    f"Image sent but vision model '{vision_model}' is not available in Ollama. "
+                    f"Falling back to {modelname}."
+                )
+
         # Retrieve and prepare system prompt if selected
         system_prompt = None
         if selected_prompt_id is not None:
@@ -485,7 +499,7 @@ async def ollama_request(message: types.Message, prompt: str = None):
         save_chat_message(message.from_user.id, "user", prompt)
 
         # Prepare the active chat with the system prompt
-        await add_prompt_to_active_chats(message, prompt, image_base64, modelname, system_prompt)
+        await add_prompt_to_active_chats(message, prompt, image_base64, active_modelname, system_prompt)
         
         logging.info(
             f"[OllamaAPI]: Processing '{prompt}' for {message.from_user.first_name} {message.from_user.last_name}"
@@ -495,7 +509,7 @@ async def ollama_request(message: types.Message, prompt: str = None):
         payload = ACTIVE_CHATS.get(message.from_user.id)
         
         # Generate response
-        async for response_data in generate(payload, modelname, prompt):
+        async for response_data in generate(payload, active_modelname, prompt):
             msg = response_data.get("message")
             if msg is None:
                 continue
@@ -503,7 +517,7 @@ async def ollama_request(message: types.Message, prompt: str = None):
             full_response += chunk
 
             if any([c in chunk for c in ".\n!?"]) or response_data.get("done"):
-                if await handle_response(message, response_data, full_response):
+                if await handle_response(message, response_data, full_response, active_modelname):
                     save_chat_message(message.from_user.id, "assistant", full_response)
                     break
 

@@ -15,6 +15,7 @@ token = os.getenv("TOKEN")
 allowed_ids = list(map(int, filter(None, os.getenv("USER_IDS", "").split(","))))
 admin_ids = list(map(int, filter(None, os.getenv("ADMIN_IDS", "").split(","))))
 group_ids = list(map(int, filter(None, os.getenv("GROUP_IDS", "").split(","))))
+vision_model = os.getenv("VISION_MODEL", "llama3.2-vision")
 ollama_base_url = os.getenv("OLLAMA_BASE_URL")
 if ollama_base_url and "://" in ollama_base_url:
     ollama_base_url = urlparse(ollama_base_url).hostname
@@ -102,7 +103,18 @@ async def model_list():
                 return data["models"]
             else:
                 return []
-                
+
+async def get_available_vision_model():
+    """Return the configured vision model name if it is available in Ollama, else None."""
+    if not vision_model:
+        return None
+    models = await model_list()
+    available_names = [m["name"] for m in models]
+    for name in available_names:
+        if name == vision_model or name.startswith(vision_model + ":"):
+            return name
+    return None
+
 async def generate(payload: dict, modelname: str, prompt: str):
     client_timeout = ClientTimeout(total=int(timeout))
     async with aiohttp.ClientSession(timeout=client_timeout) as session:
