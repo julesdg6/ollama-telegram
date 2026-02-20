@@ -171,6 +171,7 @@ How you set `OLLAMA_BASE_URL` depends on how Ollama is running:
 |        `OLLAMA_PORT`        |                                                  Your OllamaAPI port                                                  |    No     |     11434     |                                                       |
 |            `TIMEOUT`        |                                    The timeout in seconds for generating responses                                    |    No     |     3000      |                                                       |
 | `ALLOW_ALL_USERS_IN_GROUPS` |                Allows all users in group chats interact with bot without adding them to USER_IDS list                 |    No     |       0       |                                                       |
+|          `GROUP_IDS`        | Telegram group/supergroup chat IDs whose members may all use the bot without being listed in USER_IDS. Negative integers, comma-separated. |    No     |               | -1001234567890<br/>**OR**<br/>-1001234567890,-1009876543210 |
 
 
 
@@ -192,7 +193,9 @@ Add the bot to a group, then interact with it in one of two ways:
 | **Mention** | Start your message with `@<botusername>` |
 | **Reply** | Reply directly to any of the bot's previous messages |
 
-> **Note:** By default only users listed in `USER_IDS` or `ADMIN_IDS` can trigger the bot in a group. Set `ALLOW_ALL_USERS_IN_GROUPS=1` in `.env` to let **all** group members use the bot without adding each one to `USER_IDS`.
+> **Note:** By default only users listed in `USER_IDS` or `ADMIN_IDS` can trigger the bot in a group. You have two ways to open access more broadly:
+> - Set `ALLOW_ALL_USERS_IN_GROUPS=1` to let **all** group members in **any** group use the bot without being in `USER_IDS`.
+> - Set `GROUP_IDS` to a comma-separated list of group chat IDs (e.g. `-1001234567890`) to let **all** members of those **specific groups** use the bot. You can find a group's chat ID by adding [@userinfobot](https://t.me/userinfobot) to the group — it will report the group ID.
 
 ### Bot Commands
 
