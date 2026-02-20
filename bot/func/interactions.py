@@ -129,7 +129,17 @@ async def generate(payload: dict, modelname: str, prompt: str):
 
         try:
             logging.info(f"Sending request to Ollama API: {url}")
-            logging.info(f"Payload: {json.dumps(ollama_payload, indent=2)}")
+            # Log payload without image data to avoid flooding logs with base64 content
+            log_payload = {
+                "model": ollama_payload.get("model"),
+                "stream": ollama_payload.get("stream"),
+                "messages": [
+                    {k: (f"[{len(v)} image(s)]" if k == "images" and isinstance(v, list) else v) for k, v in msg.items()}
+                    if "images" in msg else msg
+                    for msg in ollama_payload.get("messages", [])
+                ],
+            }
+            logging.info(f"Payload: {json.dumps(log_payload, indent=2)}")
 
             async with session.post(url, json=ollama_payload) as response:
                 if response.status != 200:

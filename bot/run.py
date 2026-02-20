@@ -397,9 +397,13 @@ async def add_prompt_to_active_chats(message, prompt, image_base64, modelname, s
                     "content": system_prompt
                 })
         
-        # Add existing messages if the chat exists, excluding any existing system messages
+        # Add existing messages if the chat exists, excluding any existing system messages.
+        # Strip 'images' from historical messages to prevent accumulating large base64 payloads.
         if ACTIVE_CHATS.get(message.from_user.id):
-            messages.extend([msg for msg in ACTIVE_CHATS[message.from_user.id].get("messages", []) if msg.get('role') != 'system'])
+            for msg in ACTIVE_CHATS[message.from_user.id].get("messages", []):
+                if msg.get('role') != 'system':
+                    msg_copy = {k: v for k, v in msg.items() if k != 'images'}
+                    messages.append(msg_copy)
         
         # Add the new user message
         messages.append({
